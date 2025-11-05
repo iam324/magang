@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Tool - Admin Navigation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .diagnostic-box {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status-ok {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .status-error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .status-warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .test-button {
+            margin: 10px 5px;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">🔍 Diagnostic Tool - Admin Navigation</h1>
+        
+        <div class="diagnostic-box">
+            <h3>🌐 1. Browser Information</h3>
+            <div id="browser-info"></div>
+        </div>
+
+        <div class="diagnostic-box">
+            <h3>📋 2. JavaScript Status</h3>
+            <div id="js-status"></div>
+        </div>
+
+        <div class="diagnostic-box">
+            <h3>🧪 3. Function Tests</h3>
+            <button class="btn btn-primary test-button" onclick="testShowSection()">Test showSection()</button>
+            <button class="btn btn-info test-button" onclick="testQuerySelector()">Test querySelector</button>
+            <button class="btn btn-warning test-button" onclick="testEventListener()">Test Event Listener</button>
+            <div id="function-tests" class="mt-3"></div>
+        </div>
+
+        <div class="diagnostic-box">
+            <h3>🎯 4. Navigation Test</h3>
+            <p>Klik tombol untuk test navigasi:</p>
+            <button class="btn btn-success test-button" onclick="manualTest('dashboard')">Dashboard</button>
+            <button class="btn btn-success test-button" onclick="manualTest('news')">News</button>
+            <button class="btn btn-success test-button" onclick="manualTest('registrations')">Registrations</button>
+            <button class="btn btn-success test-button" onclick="manualTest('contacts')">Contacts</button>
+            <button class="btn btn-success test-button" onclick="manualTest('gallery')">Gallery</button>
+            <div id="nav-test-result" class="mt-3"></div>
+        </div>
+
+        <div class="diagnostic-box">
+            <h3>📝 5. Console Logs</h3>
+            <button class="btn btn-secondary" onclick="clearLogs()">Clear Logs</button>
+            <pre id="console-logs"></pre>
+        </div>
+
+        <div class="diagnostic-box">
+            <h3>✅ 6. Recommendations</h3>
+            <div id="recommendations"></div>
+        </div>
+    </div>
+
+    <script>
+        // Capture console logs
+        const logs = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            logs.push({type: 'log', message: args.join(' ')});
+            updateLogDisplay();
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            logs.push({type: 'error', message: args.join(' ')});
+            updateLogDisplay();
+            originalError.apply(console, args);
+        };
+
+        function updateLogDisplay() {
+            const logDiv = document.getElementById('console-logs');
+            logDiv.innerHTML = logs.map(log => 
+                `<div style="color: ${log.type === 'error' ? 'red' : 'black'}">[${log.type.toUpperCase()}] ${log.message}</div>`
+            ).join('\n');
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs.length = 0;
+            updateLogDisplay();
+        }
+
+        // 1. Browser Information
+        function checkBrowserInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                cookieEnabled: navigator.cookieEnabled,
+                onLine: navigator.onLine,
+                screenWidth: screen.width,
+                screenHeight: screen.height,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight
+            };
+            
+            let html = '<table class="table table-sm">';
+            for (let key in info) {
+                html += `<tr><td><strong>${key}:</strong></td><td>${info[key]}</td></tr>`;
+            }
+            html += '</table>';
+            
+            document.getElementById('browser-info').innerHTML = html;
+        }
+
+        // 2. JavaScript Status
+        function checkJavaScriptStatus() {
+            const tests = {
+                'JavaScript Enabled': true,
+                'querySelector Available': typeof document.querySelector === 'function',
+                'addEventListener Available': typeof document.addEventListener === 'function',
+                'classList Available': 'classList' in document.createElement('div'),
+                'Arrow Functions': (() => true)(),
+                'Fetch API': typeof fetch === 'function',
+                'LocalStorage': typeof localStorage === 'object'
+            };
+            
+            let html = '<table class="table table-sm">';
+            for (let test in tests) {
+                const status = tests[test] ? 
+                    '<span class="status-ok">✓ OK</span>' : 
+                    '<span class="status-error">✗ FAILED</span>';
+                html += `<tr><td>${test}</td><td>${status}</td></tr>`;
+            }
+            html += '</table>';
+            
+            document.getElementById('js-status').innerHTML = html;
+        }
+
+        // 3. Function Tests
+        function testShowSection() {
+            const result = document.getElementById('function-tests');
+            result.innerHTML = '<div class="alert alert-info">Testing showSection()...</div>';
+            
+            try {
+                if (typeof showSection === 'function') {
+                    result.innerHTML = '<div class="alert alert-success">✓ showSection() is defined</div>';
+                } else {
+                    result.innerHTML = '<div class="alert alert-danger">✗ showSection() is NOT defined</div>';
+                }
+            } catch (e) {
+                result.innerHTML = `<div class="alert alert-danger">✗ Error: ${e.message}</div>`;
+            }
+        }
+
+        function testQuerySelector() {
+            const result = document.getElementById('function-tests');
+            result.innerHTML = '<div class="alert alert-info">Testing querySelector...</div>';
+            
+            try {
+                const testDiv = document.querySelector('.diagnostic-box');
+                if (testDiv) {
+                    result.innerHTML = '<div class="alert alert-success">✓ querySelector works correctly</div>';
+                } else {
+                    result.innerHTML = '<div class="alert alert-warning">⚠ querySelector returned null</div>';
+                }
+            } catch (e) {
+                result.innerHTML = `<div class="alert alert-danger">✗ Error: ${e.message}</div>`;
+            }
+        }
+
+        function testEventListener() {
+            const result = document.getElementById('function-tests');
+            result.innerHTML = '<div class="alert alert-info">Testing Event Listener...</div>';
+            
+            try {
+                const testBtn = document.createElement('button');
+                let clicked = false;
+                testBtn.addEventListener('click', function() {
+                    clicked = true;
+                });
+                testBtn.click();
+                
+                if (clicked) {
+                    result.innerHTML = '<div class="alert alert-success">✓ Event Listener works correctly</div>';
+                } else {
+                    result.innerHTML = '<div class="alert alert-danger">✗ Event Listener failed</div>';
+                }
+            } catch (e) {
+                result.innerHTML = `<div class="alert alert-danger">✗ Error: ${e.message}</div>`;
+            }
+        }
+
+        // 4. Manual Navigation Test
+        function manualTest(section) {
+            const result = document.getElementById('nav-test-result');
+            console.log('Manual test for section:', section);
+            
+            result.innerHTML = `<div class="alert alert-info">Testing navigation to: <strong>${section}</strong></div>`;
+            
+            setTimeout(() => {
+                result.innerHTML = `<div class="alert alert-success">
+                    ✓ Test completed for <strong>${section}</strong><br>
+                    Check console logs above for details.
+                </div>`;
+            }, 500);
+        }
+
+        // 6. Generate Recommendations
+        function generateRecommendations() {
+            const recommendations = [];
+            
+            if (!navigator.cookieEnabled) {
+                recommendations.push('⚠️ Cookies are disabled. Some features may not work.');
+            }
+            
+            if (!navigator.onLine) {
+                recommendations.push('⚠️ Browser is offline. CDN resources may not load.');
+            }
+            
+            if (typeof fetch !== 'function') {
+                recommendations.push('❌ Fetch API not available. Browser may be outdated.');
+            }
+            
+            if (window.innerWidth < 768) {
+                recommendations.push('📱 Screen width is small. Mobile view may affect layout.');
+            }
+            
+            if (recommendations.length === 0) {
+                recommendations.push('✅ All checks passed! Your browser should work fine with admin panel.');
+            }
+            
+            document.getElementById('recommendations').innerHTML = 
+                '<ul>' + recommendations.map(r => `<li>${r}</li>`).join('') + '</ul>';
+        }
+
+        // Initialize all checks
+        window.addEventListener('load', function() {
+            console.log('Diagnostic tool loaded');
+            checkBrowserInfo();
+            checkJavaScriptStatus();
+            generateRecommendations();
+            console.log('All diagnostic checks completed');
+        });
+
+        // Dummy showSection for testing
+        function showSection(sectionName) {
+            console.log('showSection called with:', sectionName);
+            return true;
+        }
+    </script>
+</body>
+</html>

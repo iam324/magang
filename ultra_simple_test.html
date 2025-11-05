@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Ultra Simple Navigation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .nav-container {
+            background: #333;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .nav-link {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .nav-link:hover {
+            background: #777;
+        }
+        .nav-link.active {
+            background: #007bff;
+        }
+        .content-section {
+            display: none;
+            padding: 20px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .debug {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            background: black;
+            color: lime;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 400px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Navigasi Ultra Simple</h1>
+    
+    <div class="nav-container">
+        <a href="#" class="nav-link active" data-section="dashboard">Dashboard</a>
+        <a href="#" class="nav-link" data-section="news">Kelola Berita</a>
+        <a href="#" class="nav-link" data-section="registrations">Pendaftaran</a>
+        <a href="#" class="nav-link" data-section="contacts">Kontak</a>
+    </div>
+
+    <div id="dashboard-section" class="content-section active">
+        <h2>Dashboard</h2>
+        <p>Ini adalah halaman Dashboard.</p>
+        <p style="font-size: 24px; color: green;">✅ Dashboard ditampilkan!</p>
+    </div>
+
+    <div id="news-section" class="content-section">
+        <h2>Kelola Berita</h2>
+        <p>Ini adalah halaman Kelola Berita.</p>
+        <p style="font-size: 24px; color: green;">✅ Section Berita ditampilkan!</p>
+        <div style="background: white; padding: 20px; border: 1px solid #ddd;">
+            <h3>Form Upload Berita</h3>
+            <p>Form upload berita akan ada di sini.</p>
+        </div>
+    </div>
+
+    <div id="registrations-section" class="content-section">
+        <h2>Pendaftaran</h2>
+        <p>Ini adalah halaman Pendaftaran.</p>
+        <p style="font-size: 24px; color: green;">✅ Section Pendaftaran ditampilkan!</p>
+    </div>
+
+    <div id="contacts-section" class="content-section">
+        <h2>Kontak</h2>
+        <p>Ini adalah halaman Kontak.</p>
+        <p style="font-size: 24px; color: green;">✅ Section Kontak ditampilkan!</p>
+    </div>
+
+    <div class="debug" id="debug">
+        <strong>Debug Console:</strong><br>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const debugLog = document.getElementById('log');
+        
+        function log(msg) {
+            console.log(msg);
+            debugLog.innerHTML += msg + '<br>';
+            debugLog.parentElement.scrollTop = debugLog.parentElement.scrollHeight;
+        }
+
+        function showSection(sectionName) {
+            log('showSection(' + sectionName + ') called');
+            
+            // Remove active from all links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Add active to current link
+            const activeLink = document.querySelector('[data-section="' + sectionName + '"]');
+            if (activeLink) {
+                activeLink.classList.add('active');
+                log('✅ Link activated: ' + sectionName);
+            }
+            
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show target section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+                log('✅ Section displayed: ' + sectionName);
+            } else {
+                log('❌ Section NOT found: ' + sectionName);
+            }
+        }
+
+        // Setup event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page loaded');
+            
+            const links = document.querySelectorAll('[data-section]');
+            log('Found ' + links.length + ' navigation links');
+            
+            links.forEach(link => {
+                const section = link.getAttribute('data-section');
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    log('Click on: ' + section);
+                    showSection(section);
+                    return false;
+                });
+            });
+            
+            log('Event listeners added');
+            showSection('dashboard');
+        });
+    </script>
+</body>
+</html>

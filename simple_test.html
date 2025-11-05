@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test - Admin Navigation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow-x: hidden;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            z-index: 9999 !important;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 0.25rem 0.5rem;
+            transition: all 0.3s;
+            cursor: pointer !important;
+            display: block !important;
+            text-decoration: none !important;
+            user-select: none;
+        }
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.15) !important;
+            color: white !important;
+            transform: translateX(5px);
+        }
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.25) !important;
+            color: white !important;
+            font-weight: 600;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .content-section {
+            display: none !important;
+        }
+        .content-section.active {
+            display: block !important;
+        }
+        .test-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-indicator" id="indicator">
+        <i class="fas fa-info-circle"></i> Klik menu untuk test
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="text-center py-4">
+            <h5 class="text-white">TEST NAVIGATION</h5>
+            <p class="text-white-50">Simple Click Test</p>
+        </div>
+        <nav class="nav flex-column px-2">
+            <a class="nav-link active" onclick="showSection('dashboard'); return false;" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a class="nav-link" onclick="showSection('news'); return false;" data-section="news">
+                <i class="fas fa-newspaper"></i> Kelola Berita
+            </a>
+            <a class="nav-link" onclick="showSection('registrations'); return false;" data-section="registrations">
+                <i class="fas fa-user-plus"></i> Pendaftaran
+            </a>
+            <a class="nav-link" onclick="showSection('contacts'); return false;" data-section="contacts">
+                <i class="fas fa-envelope"></i> Pesan Kontak
+            </a>
+            <a class="nav-link" onclick="showSection('gallery'); return false;" data-section="gallery">
+                <i class="fas fa-images"></i> Galeri
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="content-section active">
+            <div class="alert alert-success alert-dismissible">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <hr>
+                <h4>✓ Navigation BERHASIL!</h4>
+                <p>Ini adalah halaman Dashboard. Klik menu lain untuk berpindah section.</p>
+            </div>
+        </div>
+
+        <!-- News Section -->
+        <div id="news-section" class="content-section">
+            <div class="alert alert-primary">
+                <h2><i class="fas fa-newspaper"></i> Kelola Berita</h2>
+                <hr>
+                <h4>✓ Navigation BERHASIL!</h4>
+                <p>Anda berhasil masuk ke section Kelola Berita!</p>
+            </div>
+        </div>
+
+        <!-- Registrations Section -->
+        <div id="registrations-section" class="content-section">
+            <div class="alert alert-warning">
+                <h2><i class="fas fa-user-plus"></i> Pendaftaran</h2>
+                <hr>
+                <h4>✓ Navigation BERHASIL!</h4>
+                <p>Anda berhasil masuk ke section Pendaftaran!</p>
+            </div>
+        </div>
+
+        <!-- Contacts Section -->
+        <div id="contacts-section" class="content-section">
+            <div class="alert alert-info">
+                <h2><i class="fas fa-envelope"></i> Pesan Kontak</h2>
+                <hr>
+                <h4>✓ Navigation BERHASIL!</h4>
+                <p>Anda berhasil masuk ke section Pesan Kontak!</p>
+            </div>
+        </div>
+
+        <!-- Gallery Section -->
+        <div id="gallery-section" class="content-section">
+            <div class="alert alert-secondary">
+                <h2><i class="fas fa-images"></i> Galeri</h2>
+                <hr>
+                <h4>✓ Navigation BERHASIL!</h4>
+                <p>Anda berhasil masuk ke section Galeri!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to show section - Simple and direct
+        function showSection(sectionName) {
+            console.log('Showing section:', sectionName);
+            
+            // Update indicator
+            const indicator = document.getElementById('indicator');
+            indicator.innerHTML = '<i class="fas fa-check-circle text-success"></i> ' + 
+                                  '<strong>Navigasi ke: ' + sectionName + '</strong>';
+            indicator.style.background = '#d4edda';
+            
+            // Remove active from all nav links
+            const allLinks = document.querySelectorAll('.sidebar .nav-link');
+            allLinks.forEach(function(link) {
+                link.classList.remove('active');
+            });
+            
+            // Add active to clicked link
+            const activeLink = document.querySelector('[data-section="' + sectionName + '"]');
+            if (activeLink) {
+                activeLink.classList.add('active');
+                console.log('Link activated:', sectionName);
+            }
+            
+            // Hide all sections
+            const allSections = document.querySelectorAll('.content-section');
+            allSections.forEach(function(section) {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+                console.log('Section displayed:', sectionName);
+            } else {
+                console.error('Section not found:', sectionName + '-section');
+                indicator.innerHTML = '<i class="fas fa-times-circle text-danger"></i> ERROR: Section tidak ditemukan!';
+                indicator.style.background = '#f8d7da';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page initialized');
+            showSection('dashboard');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 TK Pertiwi 14 - Site Map</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .section-card {
+            background: white;
+            margin-bottom: 2rem;
+        }
+        .link-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .link-item:last-child {
+            border-bottom: none;
+        }
+        .link-item:hover {
+            background: #f8f9fa;
+        }
+        .badge-new {
+            background: linear-gradient(135deg, #00e676, #00b359);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center text-white mb-5">
+            <h1 class="display-3 fw-bold mb-3">🎉 TK PERTIWI 14</h1>
+            <p class="lead">Website Telah Di-Upgrade dengan Fitur Modern!</p>
+            <p class="mb-0">Pilih halaman yang ingin Anda kunjungi</p>
+        </div>
+
+        <div class="row">
+            <!-- Public Pages -->
+            <div class="col-lg-6">
+                <div class="card section-card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="fas fa-globe"></i> Halaman Publik</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-home text-success"></i> Homepage</strong>
+                                <br><small class="text-muted">Halaman utama dengan animasi modern</small>
+                            </div>
+                            <a href="index.php" class="btn btn-sm btn-success">Buka</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-newspaper text-success"></i> Berita</strong>
+                                <span class="badge badge-new ms-2">NEW</span>
+                                <br><small class="text-muted">Artikel dan berita sekolah</small>
+                            </div>
+                            <a href="news.php" class="btn btn-sm btn-success">Buka</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-images text-success"></i> Galeri</strong>
+                                <span class="badge badge-new ms-2">NEW</span>
+                                <br><small class="text-muted">Foto kegiatan dengan filter</small>
+                            </div>
+                            <a href="gallery.php" class="btn btn-sm btn-success">Buka</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-quote-left text-success"></i> Testimoni</strong>
+                                <span class="badge badge-new ms-2">NEW</span>
+                                <br><small class="text-muted">Pendapat orang tua dengan rating</small>
+                            </div>
+                            <a href="testimonials.php" class="btn btn-sm btn-success">Buka</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-envelope text-success"></i> Kontak</strong>
+                                <span class="badge bg-warning text-dark ms-2">UPDATED</span>
+                                <br><small class="text-muted">Form kontak + Google Maps</small>
+                            </div>
+                            <a href="contact.php" class="btn btn-sm btn-success">Buka</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-user-plus text-success"></i> Pendaftaran</strong>
+                                <span class="badge bg-warning text-dark ms-2">UPDATED</span>
+                                <br><small class="text-muted">Form pendaftaran siswa baru</small>
+                            </div>
+                            <a href="registration.php" class="btn btn-sm btn-success">Buka</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Pages -->
+            <div class="col-lg-6">
+                <div class="card section-card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="fas fa-user-shield"></i> Admin Area</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-sign-in-alt text-primary"></i> Login</strong>
+                                <span class="badge badge-new ms-2">NEW</span>
+                                <br><small class="text-muted">admin / admin123</small>
+                            </div>
+                            <a href="login.php" class="btn btn-sm btn-primary">Buka</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-tachometer-alt text-primary"></i> Admin Panel</strong>
+                                <span class="badge badge-new ms-2">NEW</span>
+                                <br><small class="text-muted">Dashboard & Management</small>
+                            </div>
+                            <a href="admin.php" class="btn btn-sm btn-primary">Buka</a>
+                        </div>
+                        <div class="link-item bg-light">
+                            <div>
+                                <strong><i class="fas fa-database text-info"></i> Setup Database</strong>
+                                <span class="badge bg-danger">REQUIRED</span>
+                                <br><small class="text-muted">Jalankan sekali untuk setup</small>
+                            </div>
+                            <a href="setup_admin.php" class="btn btn-sm btn-info">Setup</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation -->
+                <div class="card section-card">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0"><i class="fas fa-book"></i> Dokumentasi</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-file-alt text-info"></i> README</strong>
+                                <br><small class="text-muted">Dokumentasi lengkap</small>
+                            </div>
+                            <a href="README.md" class="btn btn-sm btn-info">Lihat</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-rocket text-info"></i> Quick Start</strong>
+                                <br><small class="text-muted">Panduan cepat 5 menit</small>
+                            </div>
+                            <a href="QUICK_START.md" class="btn btn-sm btn-info">Lihat</a>
+                        </div>
+                        <div class="link-item">
+                            <div>
+                                <strong><i class="fas fa-list text-info"></i> Changelog</strong>
+                                <br><small class="text-muted">Daftar perubahan</small>
+                            </div>
+                            <a href="CHANGELOG.md" class="btn btn-sm btn-info">Lihat</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-info-circle text-warning"></i> Langkah Pertama</h5>
+                        <ol class="mb-0">
+                            <li>Klik <strong>"Setup Database"</strong> untuk membuat tabel</li>
+                            <li>Login ke <strong>Admin Panel</strong> (username: admin, password: admin123)</li>
+                            <li><strong>⚠️ PENTING:</strong> Ubah password default segera!</li>
+                            <li>Tambahkan berita, kelola konten website</li>
+                            <li>Update nomor WhatsApp dan email di semua halaman</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-star text-warning"></i> Fitur Baru</h5>
+                        <ul class="mb-0">
+                            <li>✅ Sistem Login Admin</li>
+                            <li>✅ Dashboard Statistik</li>
+                            <li>✅ Galeri Foto</li>
+                            <li>✅ Testimoni dengan Rating</li>
+                            <li>✅ Form Kontak & Pendaftaran</li>
+                            <li>✅ WhatsApp Button</li>
+                            <li>✅ FAQ Section</li>
+                            <li>✅ Responsive Design</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-exclamation-triangle text-danger"></i> Penting!</h5>
+                        <ul class="mb-0 text-danger">
+                            <li><strong>Ubah password admin!</strong></li>
+                            <li><strong>Update nomor WA: 628123456789</strong></li>
+                            <li><strong>Update email sekolah</strong></li>
+                            <li><strong>Upload logo baru (tkper.png)</strong></li>
+                            <li><strong>Backup database rutin!</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-white mt-5">
+            <p class="mb-0">&copy; 2025 TK Pertiwi 14. All Rights Reserved.</p>
+            <small>Upgraded by GitHub Copilot CLI</small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<?php
+session_start();
+require_once 'db.php';
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $title = trim($_POST['title']);
+    $content = trim($_POST['content']);
+    $image_path = '';
+    $error_message = '';
+    $success = false;
+
+    // Validate input
+    if (empty($title) || empty($content)) {
+        $error_message = "Judul dan isi berita harus diisi!";
+    } else {
+        // Handle image upload
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            $file_type = $_FILES['image']['type'];
+            $file_size = $_FILES['image']['size'];
+            
+            // Validate file type
+            if (!in_array($file_type, $allowed_types)) {
+                $error_message = "Hanya file gambar (JPG, PNG, GIF) yang diperbolehkan!";
+            }
+            // Validate file size (max 5MB)
+            elseif ($file_size > 5 * 1024 * 1024) {
+                $error_message = "Ukuran file maksimal 5MB!";
+            }
+            else {
+                $target_dir = "uploads/";
+                
+                // Create uploads directory if not exists
+                if (!file_exists($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
+                
+                // Generate unique filename
+                $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+                $unique_filename = time() . '_' . uniqid() . '.' . $file_extension;
+                $image_path = $target_dir . $unique_filename;
+                
+                // Move uploaded file
+                if (move_uploaded_file($_FILES["image"]["tmp_name"], $image_path)) {
+                    // success
+                } else {
+                    $error_message = "Gagal mengupload gambar!";
+                    $image_path = '';
+                }
+            }
+        }
+        
+        // Insert to database if no errors
+        if (empty($error_message)) {
+            $stmt = $conn->prepare("INSERT INTO articles (title, content, image_path, created_at) VALUES (?, ?, ?, NOW())");
+            $stmt->bind_param("sss", $title, $content, $image_path);
+            
+            if ($stmt->execute()) {
+                $success = true;
+                $_SESSION['success_message'] = "Berita berhasil ditambahkan!";
+            } else {
+                $error_message = "Error database: " . $stmt->error;
+                // Delete uploaded image if database insert fails
+                if (!empty($image_path) && file_exists($image_path)) {
+                    unlink($image_path);
+                }
+            }
+            
+            $stmt->close();
+        } else {
+            $_SESSION['error_message'] = $error_message;
+        }
+    }
+    
+    $conn->close();
+    
+    // Redirect back to admin panel
+    if ($success) {
+        header("Location: admin.php?section=news&success=1");
+    } else {
+        $_SESSION['error_message'] = $error_message;
+        header("Location: admin.php?section=news&error=1");
+    }
+    exit();
+} else {
+    // If not POST request, redirect to admin
+    header("Location: admin.php");
+    exit();
+}
+?>

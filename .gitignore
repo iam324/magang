@@ -1,0 +1,23 @@
+# Ignore vendor folder
+/vendor/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+logs/
+
+# Ignore backup files
+*.backup
+*.backup2
+backups/
+
+# Ignore user-uploaded content
+/uploads/
+/src/uploads/
+/assets/
+
+# Ignore local development config
+.env

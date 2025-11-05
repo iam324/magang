@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Navigation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 0.25rem 0;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: block;
+            text-decoration: none;
+            user-select: none;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .content-section {
+            display: none;
+            padding: 2rem;
+        }
+        .content-section.active {
+            display: block;
+        }
+        #status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div id="status" class="alert alert-info">
+        Klik menu di sidebar untuk test navigasi
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar position-fixed">
+                <div class="text-center py-4">
+                    <h5 class="text-white">Test Navigation</h5>
+                </div>
+                <nav class="nav flex-column px-3">
+                    <a class="nav-link active" href="javascript:void(0);" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="javascript:void(0);" data-section="news">
+                        <i class="fas fa-newspaper"></i> Kelola Berita
+                    </a>
+                    <a class="nav-link" href="javascript:void(0);" data-section="registrations">
+                        <i class="fas fa-user-plus"></i> Pendaftaran
+                    </a>
+                    <a class="nav-link" href="javascript:void(0);" data-section="contacts">
+                        <i class="fas fa-envelope"></i> Pesan Kontak
+                    </a>
+                    <a class="nav-link" href="javascript:void(0);" data-section="gallery">
+                        <i class="fas fa-images"></i> Galeri
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-4 offset-md-3 offset-lg-2">
+                <div class="py-4">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard-section" class="content-section active">
+                        <h2 class="text-success"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                        <div class="alert alert-success">
+                            <h4>Anda berada di halaman Dashboard</h4>
+                            <p>Navigation berhasil! Coba klik menu lain di sidebar.</p>
+                        </div>
+                    </div>
+
+                    <!-- News Section -->
+                    <div id="news-section" class="content-section">
+                        <h2 class="text-success"><i class="fas fa-newspaper"></i> Kelola Berita</h2>
+                        <div class="alert alert-success">
+                            <h4>Anda berada di halaman Kelola Berita</h4>
+                            <p>Navigation berhasil! Menu ini sekarang bisa diklik.</p>
+                        </div>
+                    </div>
+
+                    <!-- Registrations Section -->
+                    <div id="registrations-section" class="content-section">
+                        <h2 class="text-primary"><i class="fas fa-user-plus"></i> Pendaftaran</h2>
+                        <div class="alert alert-primary">
+                            <h4>Anda berada di halaman Pendaftaran</h4>
+                            <p>Navigation berhasil! Menu ini sekarang bisa diklik.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contacts Section -->
+                    <div id="contacts-section" class="content-section">
+                        <h2 class="text-warning"><i class="fas fa-envelope"></i> Pesan Kontak</h2>
+                        <div class="alert alert-warning">
+                            <h4>Anda berada di halaman Pesan Kontak</h4>
+                            <p>Navigation berhasil! Menu ini sekarang bisa diklik.</p>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Section -->
+                    <div id="gallery-section" class="content-section">
+                        <h2 class="text-info"><i class="fas fa-images"></i> Galeri</h2>
+                        <div class="alert alert-info">
+                            <h4>Anda berada di halaman Galeri</h4>
+                            <p>Navigation berhasil! Menu ini sekarang bisa diklik.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Section switching dengan handling yang lebih baik
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page loaded');
+            
+            const statusDiv = document.getElementById('status');
+            
+            // Ambil semua link dengan data-section
+            const navLinks = document.querySelectorAll('a[data-section]');
+            console.log('Found nav links:', navLinks.length);
+            
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const sectionName = this.getAttribute('data-section');
+                    console.log('Switching to section:', sectionName);
+                    
+                    // Update status
+                    statusDiv.className = 'alert alert-success';
+                    statusDiv.innerHTML = '<strong>✓ Berhasil!</strong> Navigasi ke ' + sectionName + ' berhasil!';
+                    
+                    // Hapus active dari semua nav-link
+                    navLinks.forEach(function(l) {
+                        l.classList.remove('active');
+                    });
+                    
+                    // Tambah active ke link yang diklik
+                    this.classList.add('active');
+                    
+                    // Sembunyikan semua section
+                    const allSections = document.querySelectorAll('.content-section');
+                    allSections.forEach(function(section) {
+                        section.classList.remove('active');
+                    });
+                    
+                    // Tampilkan section yang dipilih
+                    const targetSection = document.getElementById(sectionName + '-section');
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        console.log('Section shown:', sectionName);
+                    } else {
+                        console.error('Section not found:', sectionName + '-section');
+                        statusDiv.className = 'alert alert-danger';
+                        statusDiv.innerHTML = '<strong>✗ Error!</strong> Section tidak ditemukan: ' + sectionName;
+                    }
+                });
+            });
+            
+            // Set initial state
+            console.log('Setting initial dashboard');
+            const dashboardSection = document.getElementById('dashboard-section');
+            if (dashboardSection) {
+                dashboardSection.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
