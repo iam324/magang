@@ -50,7 +50,7 @@
                     <li class="nav-item"><a class="nav-link" href="contact.php"><i class="fas fa-envelope"></i> KONTAK</a></li>
                 </ul>
             </div>
-            <a href="registration.php" class="btn btn-outline-dark active"><i class="fas fa-user-plus"></i> PENDAFTARAN</a>
+            <a href="registration.php" class="btn btn-light"><i class="fas fa-user-plus"></i> PENDAFTARAN</a>
         </div>
     </header>
 
@@ -85,7 +85,7 @@
                     <div class="card border-0 shadow-sm text-center p-4 h-100">
                         <i class="fas fa-money-bill-wave fa-3x text-success mb-3"></i>
                         <h5>Biaya Pendaftaran</h5>
-                        <p class="text-muted">Rp 500.000</p>
+                        <p class="text-muted">Gratis</p>
                     </div>
                 </div>
             </div>

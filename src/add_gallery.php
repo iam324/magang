@@ -23,8 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $filetype = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         
         if (in_array($filetype, $allowed)) {
-            // Create uploads directory if it doesn't exist
-            $upload_dir = 'uploads/gallery/';
+            $upload_dir = '../uploads/gallery/';
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
@@ -32,9 +31,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Generate unique filename
             $new_filename = uniqid() . '_' . time() . '.' . $filetype;
             $destination = $upload_dir . $new_filename;
+            $image_path = 'uploads/gallery/' . $new_filename; // Clean path for DB
             
             if (move_uploaded_file($_FILES['image']['tmp_name'], $destination)) {
-                $image_path = $destination;
             } else {
                 $_SESSION['error_message'] = "Gagal mengupload gambar.";
                 header("Location: admin.php?section=gallery");

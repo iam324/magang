@@ -1,14 +1,14 @@
 <?php
-session_start();
+require_once 'auth_check.php';
 require_once 'db.php';
-
-// Check if admin is logged in
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: login.php");
-    exit();
-}
+require_once 'csrf_handler.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
+    if (!validate_csrf_token($_POST['csrf_token'])) {
+        $_SESSION['error_message'] = "Sesi tidak valid. Silakan coba lagi.";
+        header("Location: admin.php?section=gallery");
+        exit();
+    }
     $id = intval($_POST['id']);
     
     // Get image path before deleting

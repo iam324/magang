@@ -82,7 +82,7 @@
                     <li class="nav-item"><a class="nav-link" href="contact.php"><i class="fas fa-envelope"></i> KONTAK</a></li>
                 </ul>
             </div>
-            <a href="registration.php" class="btn btn-outline-dark"><i class="fas fa-user-plus"></i> PENDAFTARAN</a>
+            <a href="registration.php" class="btn btn-light"><i class="fas fa-user-plus"></i> PENDAFTARAN</a>
         </div>
     </header>
 

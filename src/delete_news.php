@@ -1,10 +1,14 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once 'csrf_handler.php';
 require_once 'db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
+    // Validate CSRF token
+    if (!validate_csrf_token($_POST['csrf_token'])) {
+        $_SESSION['error_message'] = "Sesi tidak valid. Silakan coba lagi.";
+        header("Location: admin.php?section=news");
+        exit();
+    }
     $article_id = intval($_POST['id']);
 
     // Get article title and image path before deleting

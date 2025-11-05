@@ -1,6 +1,8 @@
 <?php
 require_once 'auth_check.php';
 require_once 'db.php';
+require_once 'csrf_handler.php';
+$csrf_token = generate_csrf_token();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -10,78 +12,7 @@ require_once 'db.php';
     <title>Admin Panel - TK Pertiwi 14</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            overflow-x: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            width: 250px;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            z-index: 9999 !important;
-            overflow-y: auto;
-        }
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.8) !important;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            margin: 0.25rem 0.5rem;
-            transition: all 0.3s;
-            cursor: pointer !important;
-            display: block !important;
-            text-decoration: none !important;
-            user-select: none;
-            border: none;
-            background: transparent;
-        }
-        .sidebar .nav-link:hover {
-            background: rgba(255,255,255,0.15) !important;
-            color: #FFFF00 !important;
-            transform: translateX(5px);
-        }
-        .sidebar .nav-link.active {
-            background: rgba(255,255,255,0.25) !important;
-            color: white !important;
-            font-weight: 600;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-        .stat-card-admin {
-            border-left: 4px solid #00e676;
-        }
-        .content-section {
-            display: none !important;
-            animation: fadeIn 0.3s ease-in;
-        }
-        .content-section.active {
-            display: block !important;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: relative !important;
-            }
-            .main-content {
-                margin-left: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -119,6 +50,7 @@ require_once 'db.php';
 
     <!-- Main Content -->
     <div class="main-content">
+        <input type="hidden" id="globalCsrfToken" value="<?php echo $csrf_token; ?>">
                     <!-- Dashboard Section -->
                     <div id="dashboard-section" class="content-section active">
                         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -135,28 +67,47 @@ require_once 'db.php';
                             $total_gallery = 0;
                             
                             // Check and count articles
-                            $result = $conn->query("SELECT COUNT(*) as count FROM articles");
+                            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM articles");
+                            $stmt->execute();
+                            $result = $stmt->get_result();
                             if($result) $total_articles = $result->fetch_assoc()['count'];
+                            $stmt->close();
                             
                             // Check and count registrations
+                            // Note: SHOW TABLES cannot use prepared statements directly.
                             $table_check = $conn->query("SHOW TABLES LIKE 'registrations'");
                             if($table_check && $table_check->num_rows > 0) {
-                                $result = $conn->query("SELECT COUNT(*) as count FROM registrations WHERE status='pending'");
+                                $stmt = $conn->prepare("SELECT COUNT(*) as count FROM registrations WHERE status=?");
+                                $status_pending = 'pending';
+                                $stmt->bind_param("s", $status_pending);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
                                 if($result) $total_registrations = $result->fetch_assoc()['count'];
+                                $stmt->close();
                             }
                             
                             // Check and count contacts
+                            // Note: SHOW TABLES cannot use prepared statements directly.
                             $table_check = $conn->query("SHOW TABLES LIKE 'contacts'");
                             if($table_check && $table_check->num_rows > 0) {
-                                $result = $conn->query("SELECT COUNT(*) as count FROM contacts WHERE status='unread'");
+                                $stmt = $conn->prepare("SELECT COUNT(*) as count FROM contacts WHERE status=?");
+                                $status_unread = 'unread';
+                                $stmt->bind_param("s", $status_unread);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
                                 if($result) $total_contacts = $result->fetch_assoc()['count'];
+                                $stmt->close();
                             }
                             
                             // Check and count gallery
+                            // Note: SHOW TABLES cannot use prepared statements directly.
                             $table_check = $conn->query("SHOW TABLES LIKE 'gallery'");
                             if($table_check && $table_check->num_rows > 0) {
-                                $result = $conn->query("SELECT COUNT(*) as count FROM gallery");
+                                $stmt = $conn->prepare("SELECT COUNT(*) as count FROM gallery");
+                                $stmt->execute();
+                                $result = $stmt->get_result();
                                 if($result) $total_gallery = $result->fetch_assoc()['count'];
+                                $stmt->close();
                             }
                             ?>
                             <div class="col-md-3">
@@ -230,7 +181,11 @@ require_once 'db.php';
                                     </div>
                                     <div class="card-body">
                                         <?php
-                                        $recent_news = $conn->query("SELECT title, created_at FROM articles ORDER BY created_at DESC LIMIT 5");
+                                        $stmt = $conn->prepare("SELECT title, created_at FROM articles ORDER BY created_at DESC LIMIT ?");
+                                        $limit_news = 5;
+                                        $stmt->bind_param("i", $limit_news);
+                                        $stmt->execute();
+                                        $recent_news = $stmt->get_result();
                                         if($recent_news->num_rows > 0):
                                             while($row = $recent_news->fetch_assoc()):
                                         ?>
@@ -251,7 +206,11 @@ require_once 'db.php';
                                     </div>
                                     <div class="card-body">
                                         <?php
-                                        $recent_reg = $conn->query("SELECT name, created_at FROM registrations ORDER BY created_at DESC LIMIT 5");
+                                        $stmt = $conn->prepare("SELECT name, created_at FROM registrations ORDER BY created_at DESC LIMIT ?");
+                                        $limit_reg = 5;
+                                        $stmt->bind_param("i", $limit_reg);
+                                        $stmt->execute();
+                                        $recent_reg = $stmt->get_result();
                                         if($recent_reg->num_rows > 0):
                                             while($row = $recent_reg->fetch_assoc()):
                                         ?>
@@ -345,7 +304,7 @@ require_once 'db.php';
                                                         <a href='edit_news.php?id=<?php echo $row["id"]; ?>' class='btn btn-sm btn-warning'>
                                                             <i class="fas fa-edit"></i> Edit
                                                         </a>
-                                                        <button type='button' class='btn btn-sm btn-danger' onclick='confirmDelete(<?php echo $row["id"]; ?>, "<?php echo htmlspecialchars(addslashes($row["title"])); ?>")'>
+                                                        <button type='button' class='btn btn-sm btn-danger' onclick='confirmDelete(<?php echo $row["id"]; ?>, "<?php echo htmlspecialchars(addslashes($row["title"])); ?>", "<?php echo $csrf_token; ?>")'>
                                                             <i class="fas fa-trash"></i> Hapus
                                                         </button>
                                                     </div>
@@ -384,6 +343,7 @@ require_once 'db.php';
                                         </button>
                                         <form id="deleteForm" action="delete_news.php" method="post" style="display:inline;">
                                             <input type="hidden" name="id" id="deleteNewsId">
+                                            <input type="hidden" name="csrf_token" id="deleteCsrfToken">
                                             <button type="submit" class="btn btn-danger">
                                                 <i class="fas fa-trash"></i> Ya, Hapus Berita
                                             </button>
@@ -781,13 +741,22 @@ require_once 'db.php';
                                         <div class="card h-100">
                                             <?php 
                                             $image_path = !empty($row['image_path']) ? $row['image_path'] : '';
-                                            $image = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="250"%3E%3Crect fill="%2300e676" width="400" height="250"/%3E%3Ctext fill="white" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3EGaleri%3C/text%3E%3C/svg%3E';
-                                            
-                                            if (!empty($image_path) && file_exists(__DIR__ . '/' . $image_path)) {
-                                                $image = htmlspecialchars($image_path);
+                                            $image_src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="250"%3E%3Crect fill="%2300e676" width="400" height="250"/%3E%3Ctext fill="white" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3EGaleri%3C/text%3E%3C/svg%3E'; // Placeholder
+
+                                            if (!empty($image_path)) {
+                                                // Sanitize path from DB to remove any leading '../'
+                                                $clean_path = preg_replace('#^(\.\./)+#', '', $image_path);
+                                                
+                                                // Check if physical file exists relative to project root
+                                                $physical_path = __DIR__ . '/../' . $clean_path;
+
+                                                if (file_exists($physical_path)) {
+                                                    // Construct correct HTML src path relative to current file (admin.php in src/)
+                                                    $image_src = '../' . htmlspecialchars($clean_path);
+                                                }
                                             }
                                             ?>
-                                            <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title']); ?>" style="height: 200px; object-fit: cover;">
+                                            <img src="<?php echo $image_src; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title']); ?>" style="height: 200px; object-fit: cover;">
                                             <div class="card-body">
                                                 <h6 class="card-title"><?php echo htmlspecialchars($row['title']); ?></h6>
                                                 <p class="card-text"><small class="text-muted"><?php echo htmlspecialchars($row['description']); ?></small></p>
@@ -799,6 +768,7 @@ require_once 'db.php';
                                             <div class="card-footer bg-white">
                                                 <form action="delete_gallery.php" method="post" style="display:inline;" onsubmit="return confirm('Hapus foto ini dari galeri?');">
                                                     <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                                                     <button type="submit" class="btn btn-sm btn-danger w-100">
                                                         <i class="fas fa-trash"></i> Hapus
                                                     </button>
@@ -825,288 +795,7 @@ require_once 'db.php';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Function to show section - Enhanced version with event listeners
-        function showSection(sectionName) {
-            console.log('=== showSection called ===');
-            console.log('Section name:', sectionName);
-            
-            try {
-                // Remove active from all nav links
-                const allLinks = document.querySelectorAll('.sidebar .nav-link');
-                console.log('Found nav links:', allLinks.length);
-                
-                allLinks.forEach(function(link) {
-                    link.classList.remove('active');
-                });
-
-                // Add active to clicked link
-                const activeLink = document.querySelector('[data-section="' + sectionName + '"]');
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                    console.log('Active link updated');
-                } else {
-                    console.warn('Active link not found for:', sectionName);
-                }
-
-                // Hide all sections
-                const allSections = document.querySelectorAll('.content-section');
-                console.log('Found sections:', allSections.length);
-                
-                allSections.forEach(function(section) {
-                    section.classList.remove('active');
-                    section.style.display = 'none';
-                });
-
-                // Show selected section
-                const targetSection = document.getElementById(sectionName + '-section');
-                if (targetSection) {
-                    targetSection.classList.add('active');
-                    targetSection.style.display = 'block';
-                    console.log('✅ Section displayed:', sectionName);
-                    
-                    // Scroll to top
-                    window.scrollTo(0, 0);
-                } else {
-                    console.error('❌ Section not found:', sectionName + '-section');
-                }
-            } catch (error) {
-                console.error('Error in showSection:', error);
-            }
-            
-            return false;
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== Admin panel initializing ===');
-            
-            // Add click event listeners to all navigation links
-            const navLinks = document.querySelectorAll('[data-section]');
-            console.log('Setting up event listeners for', navLinks.length, 'links');
-            
-            navLinks.forEach(function(link) {
-                const section = link.getAttribute('data-section');
-                
-                // Add event listener
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Link clicked:', section);
-                    showSection(section);
-                    return false;
-                });
-                
-                console.log('Event listener added for:', section);
-            });
-
-            // Check URL parameters for section
-            const urlParams = new URLSearchParams(window.location.search);
-            const section = urlParams.get('section');
-
-            if (section) {
-                console.log('Opening section from URL:', section);
-                setTimeout(function() {
-                    showSection(section);
-                }, 100);
-            } else {
-                // Show dashboard by default
-                setTimeout(function() {
-                    showSection('dashboard');
-                }, 100);
-            }
-            
-            console.log('=== Admin panel initialized ===');
-        });
-
-        // Function to show delete confirmation modal
-        function confirmDelete(newsId, newsTitle) {
-            // Set the news ID in the hidden input
-            document.getElementById('deleteNewsId').value = newsId;
-            // Set the news title in the modal
-            document.getElementById('newsTitle').textContent = newsTitle;
-            // Show the modal
-            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            deleteModal.show();
-        }
-
-        // Function to show registration detail in modal
-        function showRegistrationDetail(data, age) {
-            // Fill child data
-            document.getElementById('detail-child-name').textContent = data.name || '-';
-            
-            if (data.dob) {
-                const dobDate = new Date(data.dob);
-                const formattedDob = dobDate.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                document.getElementById('detail-child-dob').textContent = formattedDob;
-                document.getElementById('detail-child-age').innerHTML = age ? `<span class="badge bg-info">${age} tahun</span>` : '-';
-            } else {
-                document.getElementById('detail-child-dob').textContent = '-';
-                document.getElementById('detail-child-age').textContent = '-';
-            }
-            
-            // Fill parent data
-            document.getElementById('detail-parent-name').textContent = data.parent_name || '-';
-            document.getElementById('detail-parent-email').textContent = data.email || '-';
-            document.getElementById('detail-parent-phone').textContent = data.phone || '-';
-            
-            // Fill address
-            document.getElementById('detail-address').textContent = data.address || '-';
-            
-            // Fill message (show/hide section)
-            if (data.message && data.message.trim() !== '') {
-                document.getElementById('detail-message').textContent = data.message;
-                document.getElementById('detail-message-section').style.display = 'block';
-            } else {
-                document.getElementById('detail-message-section').style.display = 'none';
-            }
-            
-            // Fill status
-            let statusBadge = '';
-            if (data.status === 'pending') {
-                statusBadge = '<span class="badge bg-warning">Pending</span>';
-            } else if (data.status === 'approved') {
-                statusBadge = '<span class="badge bg-success">Approved</span>';
-            } else if (data.status === 'rejected') {
-                statusBadge = '<span class="badge bg-danger">Rejected</span>';
-            }
-            document.getElementById('detail-status').innerHTML = statusBadge;
-            
-            // Fill created date
-            if (data.created_at) {
-                const createdDate = new Date(data.created_at);
-                const formattedDate = createdDate.toLocaleString('id-ID', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                document.getElementById('detail-created-at').textContent = formattedDate;
-            }
-            
-            // Show/hide action buttons based on status
-            const actionButtonsDiv = document.getElementById('detail-action-buttons');
-            if (data.status === 'pending') {
-                actionButtonsDiv.innerHTML = `
-                    <button type="button" class="btn btn-success me-2" onclick="approveRegistration(${data.id}); bootstrap.Modal.getInstance(document.getElementById('registrationDetailModal')).hide();">
-                        <i class="fas fa-check"></i> Setujui Pendaftaran
-                    </button>
-                    <button type="button" class="btn btn-danger me-2" onclick="rejectRegistration(${data.id}); bootstrap.Modal.getInstance(document.getElementById('registrationDetailModal')).hide();">
-                        <i class="fas fa-times"></i> Tolak Pendaftaran
-                    </button>
-                `;
-            } else {
-                actionButtonsDiv.innerHTML = `
-                    <button type="button" class="btn btn-danger me-2" onclick="deleteRegistration(${data.id}); bootstrap.Modal.getInstance(document.getElementById('registrationDetailModal')).hide();">
-                        <i class="fas fa-trash"></i> Hapus Data
-                    </button>
-                `;
-            }
-            
-            
-            // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('registrationDetailModal'));
-            modal.show();
-        }
-
-        // Function to show success modal
-        function showSuccessModal(title, message) {
-            document.getElementById('successTitle').textContent = title;
-            document.getElementById('successMessage').textContent = message;
-            const modal = new bootstrap.Modal(document.getElementById('successModal'));
-            modal.show();
-        }
-
-        // Function to show error modal
-        function showErrorModal(message) {
-            document.getElementById('errorMessage').textContent = message;
-            const modal = new bootstrap.Modal(document.getElementById('errorModal'));
-            modal.show();
-        }
-
-        // Function to approve registration
-        function approveRegistration(id) {
-            fetch('update_registration_status.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'id=' + id + '&status=approved'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    showSuccessModal('Pendaftaran Disetujui!', 'Pendaftaran berhasil disetujui. Status telah diupdate.');
-                } else {
-                    showErrorModal('Gagal menyetujui pendaftaran: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorModal('Terjadi kesalahan saat memproses permintaan');
-            });
-        }
-
-        // Function to reject registration
-        function rejectRegistration(id) {
-            fetch('update_registration_status.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'id=' + id + '&status=rejected'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    showSuccessModal('Pendaftaran Ditolak!', 'Pendaftaran berhasil ditolak. Status telah diupdate.');
-                } else {
-                    showErrorModal('Gagal menolak pendaftaran: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorModal('Terjadi kesalahan saat memproses permintaan');
-            });
-        }
-
-        // Function to delete registration (show confirmation modal)
-        function deleteRegistration(id) {
-            document.getElementById('deleteRegistrationId').value = id;
-            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteRegistrationModal'));
-            modal.show();
-        }
-
-        // Function to confirm delete registration
-        function confirmDeleteRegistration() {
-            const id = document.getElementById('deleteRegistrationId').value;
-            
-            fetch('delete_registration.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'id=' + id
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Close confirmation modal
-                bootstrap.Modal.getInstance(document.getElementById('confirmDeleteRegistrationModal')).hide();
-                
-                if(data.success) {
-                    showSuccessModal('Data Dihapus!', 'Data pendaftaran berhasil dihapus dari sistem.');
-                } else {
-                    showErrorModal('Gagal menghapus data: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                bootstrap.Modal.getInstance(document.getElementById('confirmDeleteRegistrationModal')).hide();
-                showErrorModal('Terjadi kesalahan saat menghapus data');
-            });
-        }
-    </script>
+    <script src="admin.js"></script>
 </body>
 </html>
 

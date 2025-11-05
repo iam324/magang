@@ -1,10 +1,17 @@
 <?php
 require_once 'auth_check.php';
 require_once 'db.php';
+require_once 'csrf_handler.php';
 
 header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate CSRF token
+    if (!validate_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
+        echo json_encode(['success' => false, 'message' => 'Sesi tidak valid. Silakan coba lagi.']);
+        exit();
+    }
+
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     
     // Validate input

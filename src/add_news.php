@@ -1,12 +1,6 @@
 <?php
-session_start();
+require_once 'auth_check.php';
 require_once 'db.php';
-
-// Check if admin is logged in
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header("Location: login.php");
-    exit();
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = trim($_POST['title']);
@@ -34,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $error_message = "Ukuran file maksimal 5MB!";
             }
             else {
-                $target_dir = "uploads/";
+                $target_dir = "../uploads/news/";
                 
                 // Create uploads directory if not exists
                 if (!file_exists($target_dir)) {
@@ -44,10 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Generate unique filename
                 $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
                 $unique_filename = time() . '_' . uniqid() . '.' . $file_extension;
-                $image_path = $target_dir . $unique_filename;
+                $destination_path = $target_dir . $unique_filename;
+                $image_path = "uploads/news/" . $unique_filename; // Path for DB
                 
                 // Move uploaded file
-                if (move_uploaded_file($_FILES["image"]["tmp_name"], $image_path)) {
+                if (move_uploaded_file($_FILES["image"]["tmp_name"], $destination_path)) {
                     // success
                 } else {
                     $error_message = "Gagal mengupload gambar!";
