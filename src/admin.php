@@ -60,55 +60,45 @@ $csrf_token = generate_csrf_token();
 
                         <div class="row g-4 mb-4">
                             <?php
-                            // Get statistics with error handling
-                            $total_articles = 0;
-                            $total_registrations = 0;
-                            $total_contacts = 0;
-                            $total_gallery = 0;
-                            
-                            // Check and count articles
-                            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM articles");
-                            $stmt->execute();
-                            $result = $stmt->get_result();
-                            if($result) $total_articles = $result->fetch_assoc()['count'];
-                            $stmt->close();
-                            
-                            // Check and count registrations
-                            // Note: SHOW TABLES cannot use prepared statements directly.
-                            $table_check = $conn->query("SHOW TABLES LIKE 'registrations'");
-                            if($table_check && $table_check->num_rows > 0) {
+                            // Check for required tables first
+                            $required_tables = ['articles', 'registrations', 'contacts', 'gallery'];
+                            $missing_tables = [];
+                            foreach($required_tables as $table) {
+                                $result = $conn->query("SHOW TABLES LIKE '$table'");
+                                if($result->num_rows == 0) {
+                                    $missing_tables[] = $table;
+                                }
+                            }
+
+                            if(!empty($missing_tables)):
+                            ?>
+                            <div class="col-12">
+                                <div class="alert alert-danger">
+                                    <strong>Error:</strong> Tabel berikut tidak ditemukan: 
+                                    <code><?php echo implode(', ', $missing_tables); ?></code>. 
+                                    Jalankan <a href="setup_admin.php" class="alert-link">setup_admin.php</a> untuk memperbaiki.
+                                </div>
+                            </div>
+                            <?php
+                            else:
+                                // Get statistics
+                                $total_articles = $conn->query("SELECT COUNT(*) as count FROM articles")->fetch_assoc()['count'];
+                                
                                 $stmt = $conn->prepare("SELECT COUNT(*) as count FROM registrations WHERE status=?");
                                 $status_pending = 'pending';
                                 $stmt->bind_param("s", $status_pending);
                                 $stmt->execute();
-                                $result = $stmt->get_result();
-                                if($result) $total_registrations = $result->fetch_assoc()['count'];
+                                $total_registrations = $stmt->get_result()->fetch_assoc()['count'];
                                 $stmt->close();
-                            }
-                            
-                            // Check and count contacts
-                            // Note: SHOW TABLES cannot use prepared statements directly.
-                            $table_check = $conn->query("SHOW TABLES LIKE 'contacts'");
-                            if($table_check && $table_check->num_rows > 0) {
+
                                 $stmt = $conn->prepare("SELECT COUNT(*) as count FROM contacts WHERE status=?");
                                 $status_unread = 'unread';
                                 $stmt->bind_param("s", $status_unread);
                                 $stmt->execute();
-                                $result = $stmt->get_result();
-                                if($result) $total_contacts = $result->fetch_assoc()['count'];
+                                $total_contacts = $stmt->get_result()->fetch_assoc()['count'];
                                 $stmt->close();
-                            }
-                            
-                            // Check and count gallery
-                            // Note: SHOW TABLES cannot use prepared statements directly.
-                            $table_check = $conn->query("SHOW TABLES LIKE 'gallery'");
-                            if($table_check && $table_check->num_rows > 0) {
-                                $stmt = $conn->prepare("SELECT COUNT(*) as count FROM gallery");
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-                                if($result) $total_gallery = $result->fetch_assoc()['count'];
-                                $stmt->close();
-                            }
+
+                                $total_gallery = $conn->query("SELECT COUNT(*) as count FROM gallery")->fetch_assoc()['count'];
                             ?>
                             <div class="col-md-3">
                                 <div class="card stat-card-admin shadow-sm">
@@ -170,6 +160,7 @@ $csrf_token = generate_csrf_token();
                                     </div>
                                 </div>
                             </div>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Recent Activities -->
@@ -181,20 +172,24 @@ $csrf_token = generate_csrf_token();
                                     </div>
                                     <div class="card-body">
                                         <?php
-                                        $stmt = $conn->prepare("SELECT title, created_at FROM articles ORDER BY created_at DESC LIMIT ?");
-                                        $limit_news = 5;
-                                        $stmt->bind_param("i", $limit_news);
-                                        $stmt->execute();
-                                        $recent_news = $stmt->get_result();
-                                        if($recent_news->num_rows > 0):
-                                            while($row = $recent_news->fetch_assoc()):
-                                        ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                                            <span><?php echo htmlspecialchars(substr($row['title'], 0, 40)); ?>...</span>
-                                            <small class="text-muted"><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></small>
-                                        </div>
-                                        <?php endwhile; else: ?>
-                                        <p class="text-muted text-center">Belum ada berita</p>
+                                        $table_check = $conn->query("SHOW TABLES LIKE 'articles'");
+                                        if($table_check && $table_check->num_rows > 0):
+                                            $stmt = $conn->prepare("SELECT title, created_at FROM articles ORDER BY created_at DESC LIMIT ?");
+                                            $limit_news = 5;
+                                            $stmt->bind_param("i", $limit_news);
+                                            $stmt->execute();
+                                            $recent_news = $stmt->get_result();
+                                            if($recent_news->num_rows > 0):
+                                                while($row = $recent_news->fetch_assoc()):
+                                            ?>
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <span><?php echo htmlspecialchars(substr($row['title'], 0, 40)); ?>...</span>
+                                                <small class="text-muted"><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></small>
+                                            </div>
+                                            <?php endwhile; else: ?>
+                                            <p class="text-muted text-center">Belum ada berita</p>
+                                            <?php endif; else: ?>
+                                            <p class="text-muted text-center">Tabel 'articles' tidak ditemukan.</p>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -206,20 +201,24 @@ $csrf_token = generate_csrf_token();
                                     </div>
                                     <div class="card-body">
                                         <?php
-                                        $stmt = $conn->prepare("SELECT name, created_at FROM registrations ORDER BY created_at DESC LIMIT ?");
-                                        $limit_reg = 5;
-                                        $stmt->bind_param("i", $limit_reg);
-                                        $stmt->execute();
-                                        $recent_reg = $stmt->get_result();
-                                        if($recent_reg->num_rows > 0):
-                                            while($row = $recent_reg->fetch_assoc()):
-                                        ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                                            <span><?php echo htmlspecialchars($row['name']); ?></span>
-                                            <small class="text-muted"><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></small>
-                                        </div>
-                                        <?php endwhile; else: ?>
-                                        <p class="text-muted text-center">Belum ada pendaftaran</p>
+                                        $table_check = $conn->query("SHOW TABLES LIKE 'registrations'");
+                                        if($table_check && $table_check->num_rows > 0):
+                                            $stmt = $conn->prepare("SELECT name, created_at FROM registrations ORDER BY created_at DESC LIMIT ?");
+                                            $limit_reg = 5;
+                                            $stmt->bind_param("i", $limit_reg);
+                                            $stmt->execute();
+                                            $recent_reg = $stmt->get_result();
+                                            if($recent_reg->num_rows > 0):
+                                                while($row = $recent_reg->fetch_assoc()):
+                                            ?>
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <span><?php echo htmlspecialchars($row['name']); ?></span>
+                                                <small class="text-muted"><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></small>
+                                            </div>
+                                            <?php endwhile; else: ?>
+                                            <p class="text-muted text-center">Belum ada pendaftaran</p>
+                                            <?php endif; else: ?>
+                                            <p class="text-muted text-center">Tabel 'registrations' tidak ditemukan.</p>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -252,6 +251,7 @@ $csrf_token = generate_csrf_token();
                             </div>
                             <div class="card-body">
                                 <form action="add_news.php" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                                     <div class="mb-3">
                                         <label for="title" class="form-label">Judul Berita *</label>
                                         <input type="text" id="title" name="title" class="form-control" required>
@@ -289,29 +289,33 @@ $csrf_token = generate_csrf_token();
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $sql = "SELECT id, title, created_at FROM articles ORDER BY created_at DESC";
-                                            $result = $conn->query($sql);
-                                            $no = 1;
-                                            if ($result->num_rows > 0):
-                                                while($row = $result->fetch_assoc()):
-                                            ?>
-                                            <tr>
-                                                <td><?php echo $no++; ?></td>
-                                                <td><?php echo htmlspecialchars($row["title"]); ?></td>
-                                                <td><?php echo date('d/m/Y H:i', strtotime($row["created_at"])); ?></td>
-                                                <td>
-                                                    <div class="btn-group" role="group">
-                                                        <a href='edit_news.php?id=<?php echo $row["id"]; ?>' class='btn btn-sm btn-warning'>
-                                                            <i class="fas fa-edit"></i> Edit
-                                                        </a>
-                                                        <button type='button' class='btn btn-sm btn-danger' onclick='confirmDelete(<?php echo $row["id"]; ?>, "<?php echo htmlspecialchars(addslashes($row["title"])); ?>", "<?php echo $csrf_token; ?>")'>
-                                                            <i class="fas fa-trash"></i> Hapus
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php endwhile; else: ?>
-                                            <tr><td colspan="4" class="text-center text-muted">Belum ada berita</td></tr>
+                                            $table_check = $conn->query("SHOW TABLES LIKE 'articles'");
+                                            if($table_check && $table_check->num_rows > 0):
+                                                $sql = "SELECT id, title, created_at FROM articles ORDER BY created_at DESC";
+                                                $result = $conn->query($sql);
+                                                $no = 1;
+                                                if ($result->num_rows > 0):
+                                                    while($row = $result->fetch_assoc()):
+                                                ?>
+                                                <tr>
+                                                    <td><?php echo $no++; ?></td>
+                                                    <td><?php echo htmlspecialchars($row["title"]); ?></td>
+                                                    <td><?php echo date('d/m/Y H:i', strtotime($row["created_at"])); ?></td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <a href='edit_news.php?id=<?php echo $row["id"]; ?>' class='btn btn-sm btn-warning'>
+                                                                <i class="fas fa-edit"></i> Edit
+                                                            </a>
+                                                            <button type='button' class='btn btn-sm btn-danger' onclick='confirmDelete(<?php echo $row["id"]; ?>, "<?php echo htmlspecialchars($row["title"], ENT_QUOTES); ?>", "<?php echo $csrf_token; ?>")'>
+                                                                <i class="fas fa-trash"></i> Hapus
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <?php endwhile; else: ?>
+                                                <tr><td colspan="4" class="text-center text-muted">Belum ada berita</td></tr>
+                                                <?php endif; else: ?>
+                                                <tr><td colspan="4" class="text-center text-muted">Tabel 'articles' tidak ditemukan.</td></tr>
                                             <?php endif; ?>
                                         </tbody>
                                     </table>
@@ -374,70 +378,74 @@ $csrf_token = generate_csrf_token();
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $sql = "SELECT * FROM registrations ORDER BY created_at DESC";
-                                            $result = $conn->query($sql);
-                                            $no = 1;
-                                            if ($result && $result->num_rows > 0):
-                                                while($row = $result->fetch_assoc()):
-                                                // Calculate age
-                                                $age = '';
-                                                if (!empty($row["dob"])) {
-                                                    $dob = new DateTime($row["dob"]);
-                                                    $now = new DateTime();
-                                                    $diff = $now->diff($dob);
-                                                    $age = $diff->y;
-                                                }
-                                            ?>
-                                            <tr>
-                                                <td><?php echo $no++; ?></td>
-                                                <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                                                <td>
-                                                    <?php 
+                                            $table_check = $conn->query("SHOW TABLES LIKE 'registrations'");
+                                            if($table_check && $table_check->num_rows > 0):
+                                                $sql = "SELECT * FROM registrations ORDER BY created_at DESC";
+                                                $result = $conn->query($sql);
+                                                $no = 1;
+                                                if ($result && $result->num_rows > 0):
+                                                    while($row = $result->fetch_assoc()):
+                                                    // Calculate age
+                                                    $age = '';
                                                     if (!empty($row["dob"])) {
-                                                        echo date('d F Y', strtotime($row["dob"])); 
-                                                    } else {
-                                                        echo '<span class="text-muted">-</span>';
+                                                        $dob = new DateTime($row["dob"]);
+                                                        $now = new DateTime();
+                                                        $diff = $now->diff($dob);
+                                                        $age = $diff->y;
                                                     }
-                                                    ?>
-                                                </td>
-                                                <td><?php echo htmlspecialchars($row["parent_name"]); ?></td>
-                                                <td>
-                                                    <?php echo htmlspecialchars($row["phone"]); ?><br>
-                                                    <small><?php echo htmlspecialchars($row["email"]); ?></small>
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-<?php echo $row['status']=='pending'?'warning':($row['status']=='approved'?'success':'danger'); ?>">
-                                                        <?php echo ucfirst($row['status']); ?>
-                                                    </span>
-                                                </td>
-                                                <td class="text-nowrap">
-                                                    <button class="btn btn-sm btn-info me-1" 
-                                                            onclick="showRegistrationDetail(<?php echo htmlspecialchars(json_encode($row)); ?>, '<?php echo $age; ?>')" 
-                                                            title="Lihat Detail">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <?php if($row['status'] == 'pending'): ?>
-                                                    <button class="btn btn-sm btn-success me-1" 
-                                                            onclick="approveRegistration(<?php echo $row['id']; ?>)" 
-                                                            title="Setujui">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger me-1" 
-                                                            onclick="rejectRegistration(<?php echo $row['id']; ?>)" 
-                                                            title="Tolak">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                    <?php else: ?>
-                                                    <button class="btn btn-sm btn-danger" 
-                                                            onclick="deleteRegistration(<?php echo $row['id']; ?>)" 
-                                                            title="Hapus">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                    <?php endif; ?>
-                                                </td>
-                                            </tr>
-                                            <?php endwhile; else: ?>
-                                            <tr><td colspan="7" class="text-center text-muted">Belum ada pendaftaran</td></tr>
+                                                ?>
+                                                <tr>
+                                                    <td><?php echo $no++; ?></td>
+                                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
+                                                    <td>
+                                                        <?php 
+                                                        if (!empty($row["dob"])) {
+                                                            echo date('d F Y', strtotime($row["dob"])); 
+                                                        } else {
+                                                            echo '<span class="text-muted">-</span>';
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($row["parent_name"]); ?></td>
+                                                    <td>
+                                                        <?php echo htmlspecialchars($row["phone"]); ?><br>
+                                                        <small><?php echo htmlspecialchars($row["email"]); ?></small>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-<?php echo $row['status']=='pending'?'warning':($row['status']=='approved'?'success':'danger'); ?>">
+                                                            <?php echo ucfirst($row['status']); ?>
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-nowrap">
+                                                        <button class="btn btn-sm btn-info me-1" 
+                                                                onclick="showRegistrationDetail(<?php echo htmlspecialchars(json_encode($row)); ?>, '<?php echo $age; ?>')" 
+                                                                title="Lihat Detail">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <?php if($row['status'] == 'pending'): ?>
+                                                        <button class="btn btn-sm btn-success me-1" 
+                                                                onclick="approveRegistration(<?php echo $row['id']; ?>)" 
+                                                                title="Setujui">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger me-1" 
+                                                                onclick="rejectRegistration(<?php echo $row['id']; ?>)" 
+                                                                title="Tolak">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                        <?php else: ?>
+                                                        <button class="btn btn-sm btn-danger" 
+                                                                onclick="deleteRegistration(<?php echo $row['id']; ?>)" 
+                                                                title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                                <?php endwhile; else: ?>
+                                                <tr><td colspan="7" class="text-center text-muted">Belum ada pendaftaran</td></tr>
+                                                <?php endif; else: ?>
+                                                <tr><td colspan="7" class="text-center text-muted">Tabel 'registrations' tidak ditemukan.</td></tr>
                                             <?php endif; ?>
                                         </tbody>
                                     </table>
@@ -627,29 +635,33 @@ $csrf_token = generate_csrf_token();
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $sql = "SELECT * FROM contacts ORDER BY created_at DESC";
-                                            $result = $conn->query($sql);
-                                            $no = 1;
-                                            if ($result && $result->num_rows > 0):
-                                                while($row = $result->fetch_assoc()):
-                                            ?>
-                                            <tr>
-                                                <td><?php echo $no++; ?></td>
-                                                <td>
-                                                    <?php echo htmlspecialchars($row["name"]); ?><br>
-                                                    <small><?php echo htmlspecialchars($row["email"]); ?></small>
-                                                </td>
-                                                <td><?php echo htmlspecialchars($row["subject"]); ?></td>
-                                                <td><?php echo htmlspecialchars(substr($row["message"], 0, 50)); ?>...</td>
-                                                <td><?php echo date('d/m/Y', strtotime($row["created_at"])); ?></td>
-                                                <td>
-                                                    <span class="badge bg-<?php echo $row['status']=='unread'?'danger':'secondary'; ?>">
-                                                        <?php echo ucfirst($row['status']); ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <?php endwhile; else: ?>
-                                            <tr><td colspan="6" class="text-center text-muted">Belum ada pesan</td></tr>
+                                            $table_check = $conn->query("SHOW TABLES LIKE 'contacts'");
+                                            if($table_check && $table_check->num_rows > 0):
+                                                $sql = "SELECT * FROM contacts ORDER BY created_at DESC";
+                                                $result = $conn->query($sql);
+                                                $no = 1;
+                                                if ($result && $result->num_rows > 0):
+                                                    while($row = $result->fetch_assoc()):
+                                                ?>
+                                                <tr>
+                                                    <td><?php echo $no++; ?></td>
+                                                    <td>
+                                                        <?php echo htmlspecialchars($row["name"]); ?><br>
+                                                        <small><?php echo htmlspecialchars($row["email"]); ?></small>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($row["subject"]); ?></td>
+                                                    <td><?php echo htmlspecialchars(substr($row["message"], 0, 50)); ?>...</td>
+                                                    <td><?php echo date('d/m/Y', strtotime($row["created_at"])); ?></td>
+                                                    <td>
+                                                        <span class="badge bg-<?php echo $row['status']=='unread'?'danger':'secondary'; ?>">
+                                                            <?php echo ucfirst($row['status']); ?>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <?php endwhile; else: ?>
+                                                <tr><td colspan="6" class="text-center text-muted">Belum ada pesan</td></tr>
+                                                <?php endif; else: ?>
+                                                <tr><td colspan="6" class="text-center text-muted">Tabel 'contacts' tidak ditemukan.</td></tr>
                                             <?php endif; ?>
                                         </tbody>
                                     </table>
@@ -683,6 +695,7 @@ $csrf_token = generate_csrf_token();
                             </div>
                             <div class="card-body">
                                 <form action="add_gallery.php" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">

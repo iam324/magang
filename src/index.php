@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         .hero-modern {
-            background: linear-gradient(135deg, rgba(0, 230, 118, 0.9), rgba(0, 179, 89, 0.9)), url('https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=1200');
+            background: linear-gradient(135deg, rgba(0, 230, 118, 0.9), rgba(0, 179, 89, 0.9)), url('../assets/images/background.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;

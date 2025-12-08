@@ -1,8 +1,12 @@
 <?php
 require_once 'auth_check.php';
 require_once 'db.php';
+require_once 'csrf_handler.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_POST['csrf_token']) || !validate_csrf_token($_POST['csrf_token'])) {
+        die('Invalid CSRF token');
+    }
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
     $image_path = '';
@@ -45,8 +49,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (move_uploaded_file($_FILES["image"]["tmp_name"], $destination_path)) {
                     // success
                 } else {
-                    $error_message = "Gagal mengupload gambar!";
-                    $image_path = '';
+                    $_SESSION['error_message'] = "Gagal mengupload gambar!";
+                    header("Location: admin.php?section=news&error=1");
+                    exit();
                 }
             }
         }
