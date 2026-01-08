@@ -106,8 +106,8 @@
                             $image_path = !empty($row['image_path']) ? $row['image_path'] : '';
                             $image = get_placeholder_image_svg(400, 250, 'Galeri TK Pertiwi 14');
                             
-                            if (!empty($image_path) && file_exists(__DIR__ . '/' . $image_path)) {
-                                $image = htmlspecialchars($image_path);
+                            if (!empty($image_path) && file_exists(__DIR__ . '/../' . $image_path)) {
+                                $image = '../' . htmlspecialchars($image_path);
                             }
                             
                             echo "<div class='col-md-4 gallery-card' data-category='{$category}'>";

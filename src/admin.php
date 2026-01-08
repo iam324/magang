@@ -15,6 +15,10 @@ $csrf_token = generate_csrf_token();
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+    <button id="sidebar-toggle" title="Toggle Sidebar">
+        <i class="fas fa-angle-left"></i>
+    </button>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="text-center py-4">

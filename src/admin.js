@@ -87,6 +87,26 @@
                     showSection('dashboard');
                 }, 100);
             }
+
+            // === Sidebar Toggle Logic ===
+            const toggleButton = document.getElementById('sidebar-toggle');
+            const body = document.body;
+
+            const isMobile = () => window.innerWidth <= 768;
+
+            // Set initial state based on localStorage or mobile view
+            if (localStorage.getItem('sidebar_collapsed') === 'true' || (isMobile() && localStorage.getItem('sidebar_collapsed') !== 'false')) {
+                body.classList.add('sidebar-collapsed');
+            }
+
+            if (toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    body.classList.toggle('sidebar-collapsed');
+                    // Save the state to localStorage
+                    const isCollapsed = body.classList.contains('sidebar-collapsed');
+                    localStorage.setItem('sidebar_collapsed', isCollapsed);
+                });
+            }
             
             console.log('=== Admin panel initialized ===');
         });

@@ -96,33 +96,26 @@
     <section class="py-5">
         <div class="container">
             <h2 class="text-center mb-5"><i class="fas fa-list-ol text-success"></i> Langkah Pendaftaran</h2>
-            <div class="row g-4">
-                <div class="col-md-3">
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
                     <div class="step">
                         <div class="step-number">1</div>
                         <h5>Isi Formulir</h5>
                         <p class="text-muted">Lengkapi formulir pendaftaran online</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="step">
                         <div class="step-number">2</div>
                         <h5>Verifikasi Data</h5>
-                        <p class="text-muted">Tim kami akan memverifikasi data Anda</p>
+                        <p class="text-muted">Datang ke Sekolah dan Memverifikasi data Anda</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="step">
                         <div class="step-number">3</div>
-                        <h5>Pembayaran</h5>
-                        <p class="text-muted">Lakukan pembayaran biaya pendaftaran</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="step">
-                        <div class="step-number">4</div>
                         <h5>Konfirmasi</h5>
-                        <p class="text-muted">Terima konfirmasi dan jadwal tes</p>
+                        <p class="text-muted">Terima konfirmasi</p>
                     </div>
                 </div>
             </div>

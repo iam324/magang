@@ -66,26 +66,88 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                min-height: 0;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .sidebar .nav-link {
-                flex-grow: 1;
-                text-align: center;
-            }
-            .main-content {
-                margin-left: 0;
-            }
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                flex-direction: column;
-            }
-        }
+/* === Collapsible Sidebar Styles === */
+.sidebar,
+.main-content,
+#sidebar-toggle {
+    transition: all 0.3s ease-in-out;
+}
+
+#sidebar-toggle {
+    position: fixed;
+    top: 20px;
+    left: 230px;
+    z-index: 10000;
+    background: #764ba2;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#sidebar-toggle:hover {
+    background: #667eea;
+}
+
+#sidebar-toggle i {
+    transition: transform 0.3s ease;
+}
+
+/* --- Collapsed State --- */
+body.sidebar-collapsed .sidebar {
+    width: 80px;
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: 80px;
+}
+
+body.sidebar-collapsed #sidebar-toggle {
+    left: 60px;
+}
+
+body.sidebar-collapsed #sidebar-toggle i {
+    transform: rotate(180deg);
+}
+
+body.sidebar-collapsed .sidebar .text-center h5,
+body.sidebar-collapsed .sidebar .text-center p {
+    display: none;
+}
+
+body.sidebar-collapsed .sidebar .text-center img {
+    max-height: 50px !important;
+}
+
+body.sidebar-collapsed .sidebar .nav-link {
+    font-size: 0; /* Hide text nodes */
+    text-align: center;
+    padding: 0.75rem 0;
+}
+
+body.sidebar-collapsed .sidebar .nav-link i {
+    font-size: 1.3rem;
+    margin-right: 0;
+}
+
+body.sidebar-collapsed .sidebar .nav-link:hover {
+    transform: none;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    /* Collapse sidebar by default on mobile */
+    body {
+        /* Add sidebar-collapsed by default via JS */
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+}

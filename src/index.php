@@ -252,8 +252,9 @@
                         $image_path = !empty($row['image_path']) ? $row['image_path'] : '';
                         $image = get_placeholder_image_svg(400, 250);
                         
-                        if (!empty($image_path) && file_exists(__DIR__ . '/' . $image_path)) {
-                            $image = htmlspecialchars($image_path);
+                        // Corrected file existence check and path for src attribute
+                        if (!empty($image_path) && file_exists(__DIR__ . '/../' . $image_path)) {
+                            $image = '../' . htmlspecialchars($image_path);
                         }
                         
                         echo "<div class='col-md-4'>";

@@ -51,8 +51,8 @@
                     $image_path = !empty($article['image_path']) ? $article['image_path'] : '';
                     $image = get_placeholder_image_svg(1200, 600);
                     
-                    if (!empty($image_path) && file_exists(__DIR__ . '/' . $image_path)) {
-                        $image = htmlspecialchars($image_path);
+                    if (!empty($image_path) && file_exists(__DIR__ . '/../' . $image_path)) {
+                        $image = '../' . htmlspecialchars($image_path);
                     }
                     
                     echo "<div class='row justify-content-center'>";
