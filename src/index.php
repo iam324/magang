@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         .hero-modern {
-            background: linear-gradient(135deg, rgba(0, 230, 118, 0.9), rgba(0, 179, 89, 0.9)), url('../assets/images/background.jpg');
+            background: rgba(25, 135, 84, 0.9) url('../assets/images/background.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -36,13 +36,13 @@
         }
         .feature-icon {
             font-size: 3rem;
-            background: linear-gradient(135deg, #00e676, #00b359);
+            background: #198754;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         .stat-card {
-            background: linear-gradient(135deg, #00e676, #00b359);
+            background: #198754;
             color: white;
             border-radius: 15px;
             padding: 2rem;
@@ -65,7 +65,7 @@
     </style>
 </head>
 <body>
-    <header class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm sticky-top">
+    <header class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top" style="background-color: #198754;">
         <div class="container">
             <a class="navbar-brand fw-bold" href="index.php">
                 <img src="../assets/tkpertiwilogo-removebg-preview.png" alt="TK Pertiwi 14 Logo" style="height: 40px; margin-right: 10px;"> 
@@ -335,24 +335,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                            Apakah ada program ekstrakurikuler?
-                        </button>
-                    </h2>
-                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Ya, kami menyediakan berbagai program ekstrakurikuler seperti menari, menyanyi, melukis, dan olahraga yang disesuaikan dengan minat dan bakat anak.
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="py-5" style="background: linear-gradient(135deg, #00e676 0%, #00b359 100%);">
+    <section class="py-5" style="background: #198754;">
         <div class="container text-center text-white">
             <h2 class="display-5 fw-bold mb-4">Siap Bergabung dengan Keluarga Besar TK Pertiwi 14?</h2>
             <p class="lead mb-4">Daftarkan putra-putri Anda sekarang dan berikan pendidikan terbaik untuk masa depan mereka!</p>

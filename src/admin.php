@@ -186,7 +186,8 @@ $csrf_token = generate_csrf_token();
                                             if($recent_news->num_rows > 0):
                                                 while($row = $recent_news->fetch_assoc()):
                                             ?>
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center 
+                                            mb-2 pb-2 border-bottom">
                                                 <span><?php echo htmlspecialchars(substr($row['title'], 0, 40)); ?>...</span>
                                                 <small class="text-muted"><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></small>
                                             </div>
